@@ -1,0 +1,17 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/meteobar
+meteobar.so
+meteobar.dylib
+meteobar.dll
+libmeteobar.a
+meteobar.a
+meteobar.lib
+meteobar-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst

@@ -1,0 +1,11 @@
+{
+	"description": "A weather indicator for waybar. Weather data is retrieved from Open-Meteo.",
+	"dependencies": {
+	},
+	"authors": [
+		"Carson Evans"
+	],
+	"copyright": "Copyright © 2026, Carson Evans",
+	"license": "MIT",
+	"name": "meteobar"
+}
