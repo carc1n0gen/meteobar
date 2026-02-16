@@ -29,7 +29,7 @@ Usage: meteobar [options]
 }
 ```
 
-You can get your latitude/longitude pretty easily with `curl ipinfo.io`, or even better if you have `jq` installed you can run `curl ipinfo.io | jq -r '.loc'`
+You can get your latitude/longitude pretty easily with `curl ipinfo.io`, or even better if you have `jq` installed you can run `curl -s ipinfo.io | jq -r '.loc'`
 
 ## TODO
 
