@@ -17,10 +17,18 @@ Usage: meteobar [options]
 -h      --help This help information.
 ```
 
+The `--daily`, `--hourly`, and `--current` have default values if not provided:
+
+**daily**: `temperature_2m_max,temperature_2m_min,sunrise,sunset,weather_code`
+
+**hourly**: `temperature_2m,apparent_temperature,relative_humidity_2m,weather_code`
+
+**current**: `temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code`
+
 ## Waybar Config
 
 ```
-"custom/wttrbar": {
+"custom/meteobar": {
     "format": "{}",
     "tooltip": true,
     "restart-interval": 3600,
