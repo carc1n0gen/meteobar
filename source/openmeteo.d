@@ -1,8 +1,7 @@
 module openmeteo;
 
-import std.stdio;
-
 import std.conv;
+import std.stdio;
 import std.variant;
 import std.array : join;
 import std.datetime : dur;
@@ -13,10 +12,14 @@ import curl = std.net.curl;
 
 import core.thread : Thread;
 
+
 private immutable string[] PARAM_ARRAY_KEYS = ["daily", "hourly", "current"];
 
 private immutable string[] MATRIX_ARRAY_KEYS = ["daily", "hourly"];
 
+/**
+ * Exception thrown when the open-meteo API returns an invalid response that cannot be parsed as JSON.
+ */
 class OpenMeteoResponseException : Exception
 {
     this(string message)
@@ -25,6 +28,9 @@ class OpenMeteoResponseException : Exception
     }
 }
 
+/**
+ * Exception thrown when the weatherApi function fails to connect to the open-meteo API after multiple attempts.
+ */
 class OpenMeteoConnectionException : Exception
 {
     this(string message)
@@ -91,7 +97,7 @@ WeatherCodeInfo getWeatherCodeInfo(int code)
     }
     else
     {
-        return WeatherCodeInfo("Unknown", "❓");
+        return WeatherCodeInfo("Unknown weather code " ~ code.to!string, "❓");
     }
 }
 

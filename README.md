@@ -27,6 +27,8 @@ The `--daily`, `--hourly`, and `--current` have default values if not provided:
 
 ## Waybar Config
 
+(example location set to Toronto)
+
 ```
 "custom/meteobar": {
     "format": "{}",
