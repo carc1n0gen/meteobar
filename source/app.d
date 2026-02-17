@@ -110,7 +110,7 @@ int main(string[] args)
 		auto hourlyForDay = data["hourly"].array.filter!((hour) {
 			DateTime hourDate = DateTime.fromISOExtString(hour["time"].str ~ ":00");
 			// get todays hours, and only every other hour to avoid cluttering the tooltip
-			return hourDate.hour % 2 == 0 &&hourDate.date == dayDate.date;
+			return hourDate.hour % 2 == 0 && hourDate.date == dayDate.date;
 		});
 
 		foreach (hour; hourlyForDay)
