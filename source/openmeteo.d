@@ -5,14 +5,33 @@ import std.stdio;
 import std.conv;
 import std.variant;
 import std.array : join;
-import std.json : JSONValue;
+import std.datetime : dur;
 import std.algorithm.searching : canFind;
+import std.json : JSONValue, parseJSON, JSONException;
 
 import curl = std.net.curl;
+
+import core.thread : Thread;
 
 private immutable string[] PARAM_ARRAY_KEYS = ["daily", "hourly", "current"];
 
 private immutable string[] MATRIX_ARRAY_KEYS = ["daily", "hourly"];
+
+class OpenMeteoResponseException : Exception
+{
+    this(string message)
+    {
+        super(message);
+    }
+}
+
+class OpenMeteoConnectionException : Exception
+{
+    this(string message)
+    {
+        super(message);
+    }
+}
 
 /**
  * Represents weather description and icon for a given weather code.
@@ -77,14 +96,17 @@ WeatherCodeInfo getWeatherCodeInfo(int code)
 }
 
 /**
- * Makes a GET request to the specified open-meteo API URL with the given parameters and returns the response as a string.
+ * Makes a GET request to the specified open-meteo API URL with the given parameters and returns the parsed response as a `JSONValue`.
  * Params:
  *   url: (`string`) The base URL of the open-meteo API endpoint.
  *   parameters: (`Variant[string]`) An associative array of query parameters to include in the API request. The values can be either strings or arrays of strings.
  * Returns:
- *   A `string` containing the response from the open-meteo API.
+ *   A `JSONValue` containing the parsed response from the open-meteo API.
+ * Throws:
+ *   `OpenMeteoResponseException` if the API response cannot be parsed as valid JSON.
+ *   `OpenMeteoConnectionException` if the API request fails after multiple attempts. The function will retry the request up to 20 times with a backoff strategy before throwing this exception.
  */
-string weatherApi(string url, Variant[string] parameters)
+JSONValue weatherApi(string url, Variant[string] parameters)
 {
     string paramString = "";
     foreach (kv; parameters.byKeyValue)
@@ -103,7 +125,30 @@ string weatherApi(string url, Variant[string] parameters)
         paramString ~= "&";
     }
 
-    return cast(string)curl.get(url ~ "?" ~ paramString);
+    int attempts = 0;
+    int maxAttempts = 20;
+    while (true)
+    {
+        try
+        {
+            string response = cast(string)curl.get(url ~ "?" ~ paramString);
+            return parseJSON(response);
+        }
+        catch (JSONException jsonEx)
+        {
+            throw new OpenMeteoResponseException("Invalid open-meteo response: " ~ jsonEx.msg);
+        }
+        catch (curl.CurlException curlEx)
+        {
+            attempts++;
+            if (attempts >= maxAttempts)
+            {
+                throw new OpenMeteoConnectionException("Failed to reach to open-meteo API after " ~ attempts.to!string ~ " attempts: " ~ curlEx.msg);
+            }
+
+            Thread.sleep(dur!("msecs")(500 * attempts));
+        }
+    }
 }
 
 private JSONValue[] recordsFromMatrix(JSONValue matrix)

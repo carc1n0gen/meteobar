@@ -12,7 +12,7 @@ import std.json : JSONValue, parseJSON;
 
 import cli : parseArgs;
 import utils : dateTimeToTimeString, dateToHourString;
-import openmeteo : weatherApi, deMatrixData, getWeatherCodeInfo;
+import openmeteo : weatherApi, deMatrixData, getWeatherCodeInfo, OpenMeteoResponseException, OpenMeteoConnectionException;
 
 
 int main(string[] args)
@@ -33,8 +33,22 @@ int main(string[] args)
 	writeln(`{"text":"⏳","tooltip":"Loading...","class":"loading"}`);
 	stdout.flush();
 
-	auto response = weatherApi("https://api.open-meteo.com/v1/forecast", params);
-	JSONValue data = deMatrixData(parseJSON(response));
+	JSONValue data;
+	try
+	{
+		data = weatherApi("https://api.open-meteo.com/v1/forecast", params);
+		data = deMatrixData(data);
+	}
+	catch (OpenMeteoResponseException responseEx)
+	{
+		writeln(`{"text":"⛓️‍💥", "tooltip":"Invalid open-meteo response", "class":"error"}`);
+		return 0;
+	}
+	catch (OpenMeteoConnectionException connectionEx)
+	{
+		writeln(`{"text":"⛓️‍💥", "tooltip":"Error reaching open-meteo API", "class":"error"}`);
+		return 0;
+	}
 
 	int weatherCode = data["current"].object["weather_code"].integer.to!int; /// JSONValue.integer actually returns a long, but we know it's safe to convert to int since the weather codes are small integers
 	auto weatherCodeInfo = getWeatherCodeInfo(weatherCode);
