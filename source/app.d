@@ -109,8 +109,8 @@ int main(string[] args)
 		
 		auto hourlyForDay = data["hourly"].array.filter!((hour) {
 			DateTime hourDate = DateTime.fromISOExtString(hour["time"].str ~ ":00");
-			// get todays hours, and only every other hour to avoid cluttering the tooltip
-			return hourDate.hour % 2 == 0 && hourDate.date == dayDate.date;
+			// get todays hours, and only every third hour to avoid cluttering the tooltip
+			return hourDate.hour % 3 == 0 && hourDate.date == dayDate.date;
 		});
 
 		foreach (hour; hourlyForDay)
@@ -118,7 +118,7 @@ int main(string[] args)
 			DateTime hourTime = DateTime.fromISOExtString(hour["time"].str ~ ":00");
 			auto dayWeatherCodeInfo = getWeatherCodeInfo(hour["weather_code"].integer.to!int);
 			tooltip.put(format(
-				"%s\t%s %s°\t%s\n",
+				"%s %s %4s° %s\n",
 				dateToHourString(hourTime, options.ampm),
 				dayWeatherCodeInfo.icon,
 				hour["temperature_2m"].floating.to!string,

@@ -41,6 +41,8 @@ The `--daily`, `--hourly`, and `--current` have default values if not provided:
 
 You can get your latitude/longitude pretty easily with `curl ipinfo.io`, or even better if you have `jq` installed you can run `curl -s ipinfo.io | jq -r '.loc'`
 
+For the data in the tooltip to align correctly, it is best to use a monospace font for waybar, or at least the tooltips.
+
 ## TODO
 
 - translations support
