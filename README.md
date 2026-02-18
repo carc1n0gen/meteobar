@@ -1,6 +1,12 @@
 ## Installation
 
-Install `dmd` and `dub` on your distro of choice then compile the project with `dub build` or `dub build --build=release`
+### From Source
+
+Install `dmd` and `dub` on your distro of choice then compile the project with `dub build` or `dub build --build=release`. Then move the compiled `meteobar` binary somewhere in your path.
+
+### From Release
+
+Head over to [releases](https://github.com/carc1n0gen/meteobar/releases), download the latest version, extract the .tar.gz, and put the resulting `meteobar` binary somewhere in your path.
 
 ## Usage
 
@@ -48,3 +54,4 @@ For the data in the tooltip to align correctly, it is best to use a monospace fo
 - translations support
 - custom date formats
 - location auto-detection
+- ~~param to defined how many hours per day to show hourly data for~~

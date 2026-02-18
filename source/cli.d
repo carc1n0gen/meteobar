@@ -17,6 +17,7 @@ struct CliOptions
     string temperatureUnit = "celsius";
     string windSpeedUnit = "kmh";
     bool ampm = false;
+    int hoursToShow = 12;
     // string timezone = "";
 }
 
@@ -36,7 +37,8 @@ CliOptions parseArgs(string[] args)
         "current", "Current variables (comma-separated) (optional)", splitParams(options.current),
         "temp-unit", "Temperature unit (celsius or fahrenheit) (default: celsius)", &options.temperatureUnit,
         "wind-unit", "Wind speed unit (one of kmh, ms, mph, kn) (default: kmh)", &options.windSpeedUnit,
-        "ampm", "Use 12-hour time format with AM/PM (default: false)", &options.ampm
+        "ampm", "Use 12-hour time format with AM/PM (default: false)", &options.ampm,
+        "hours", "Number of hours to show in the tooltip (default: 12)", &options.hoursToShow,
         // "tz", "Timezone of the location", &options.timezone
     );
 

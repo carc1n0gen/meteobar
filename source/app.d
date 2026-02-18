@@ -5,9 +5,10 @@ import std.string;
 import std.variant;
 import std.datetime;
 import std.conv : to;
-import std.array: appender;
 import std.format : format;
+import std.range : enumerate;
 import std.algorithm : filter;
+import std.array: appender, array;
 import std.json : JSONValue, parseJSON;
 
 import cli : parseArgs;
@@ -81,15 +82,16 @@ int main(string[] args)
 		dateTimeToTimeString(dataTime, options.ampm)
 	));
 
-	foreach (i, day; data["daily"].array)
+	auto days = data["daily"].array;
+	foreach (dayIndex, day; days)
 	{
 		tooltip.put("\n<b>");
 
-		if (i == 0)
+		if (dayIndex == 0)
 		{
 			tooltip.put("Today, ");
 		}
-		else if (i == 1)
+		else if (dayIndex == 1)
 		{
 			tooltip.put("Tomorrow, ");
 		}
@@ -107,23 +109,28 @@ int main(string[] args)
 			dateTimeToTimeString(sunset, options.ampm)
 		));
 		
+		int step = 24 / options.hoursToShow; // Show every nth hour. Total hours in a day (24) divided by the number of hours we want to show
 		auto hourlyForDay = data["hourly"].array.filter!((hour) {
 			DateTime hourDate = DateTime.fromISOExtString(hour["time"].str ~ ":00");
-			// get todays hours, and only every third hour to avoid cluttering the tooltip
-			return hourDate.hour % 3 == 0 && hourDate.date == dayDate.date;
-		});
+			return hourDate.hour % step == 0 && hourDate.date == dayDate.date;
+		}).array;
 
-		foreach (hour; hourlyForDay)
+		foreach (hourIndex, hour; hourlyForDay)
 		{
 			DateTime hourTime = DateTime.fromISOExtString(hour["time"].str ~ ":00");
 			auto dayWeatherCodeInfo = getWeatherCodeInfo(hour["weather_code"].integer.to!int);
 			tooltip.put(format(
-				"%s %s %4s° %s\n",
+				"%s %s %4s° %s",
 				dateToHourString(hourTime, options.ampm),
 				dayWeatherCodeInfo.icon,
 				hour["temperature_2m"].floating.to!string,
 				dayWeatherCodeInfo.description
 			));
+
+			if (hourIndex != hourlyForDay.length - 1 || dayIndex != days.length - 1)
+			{
+				tooltip.put("\n");
+			}
 		}
 	}
 
