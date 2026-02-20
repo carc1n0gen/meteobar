@@ -8,5 +8,10 @@
 	"license": "MIT",
 	"targetPath": "bin",
 	"dependencies": {
+	},
+	"buildTypes": {
+		"debug": {
+			"buildOptions": ["debugMode", "debugInfo"]
+		}
 	}
 }

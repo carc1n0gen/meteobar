@@ -1,0 +1,14 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug meteobar",
+			"program": "${workspaceFolder}/bin/meteobar",
+			"args": ["--lat", "51.5074", "--long", "-0.1278"],
+			"cwd": "${workspaceFolder}",
+			"preLaunchTask": "build-debug"
+		}
+	]
+}

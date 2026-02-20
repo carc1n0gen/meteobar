@@ -2,7 +2,7 @@
 
 ### From Source
 
-Install `dmd` and `dub` on your distro of choice then compile the project with `dub build` or `dub build --build=release`. Then move the compiled `meteobar` binary somewhere in your path.
+Install `ldc` (or `dmd` if you prefer) and `dub` on your distro of choice then compile the project with `dub build` or `dub build --build=release`. Then move the compiled `meteobar` binary somewhere in your path.
 
 ### From Release
 
@@ -12,15 +12,17 @@ Head over to [releases](https://github.com/carc1n0gen/meteobar/releases), downlo
 
 ```
 Usage: meteobar [options]
-         --lat Latitude of the location
-        --long Longitude of the location
-       --daily Daily variables (comma-separated) (optional)
-      --hourly Hourly variables (comma-separated) (optional)
-     --current Current variables (comma-separated) (optional)
-   --temp-unit Temperature unit (celsius or fahrenheit) (default: celsius)
-   --wind-unit Wind speed unit (one of kmh, ms, mph, kn) (default: kmh)
-        --ampm Use 12-hour time format with AM/PM (default: false)
--h      --help This help information.
+           --lat Latitude of the location
+          --long Longitude of the location
+         --daily Daily variables (comma-separated) (optional)
+        --hourly Hourly variables (comma-separated) (optional)
+       --current Current variables (comma-separated) (optional)
+     --temp-unit Temperature unit (celsius or fahrenheit) (default: celsius)
+     --wind-unit Wind speed unit (one of kmh, ms, mph, kn) (default: kmh)
+          --ampm Use 12-hour time format with AM/PM (default: false)
+   --shown-hours Number of hours to show in the tooltip per day (default: 12)
+   --date-format Date format string for daily forecasts (default: %Y-%m-%d)
+-h        --help This help information.
 ```
 
 The `--daily`, `--hourly`, and `--current` have default values if not provided:
@@ -52,6 +54,6 @@ For the data in the tooltip to align correctly, it is best to use a monospace fo
 ## TODO
 
 - translations support
-- custom date formats
+- ~~custom date formats~~
 - location auto-detection
 - ~~param to defined how many hours per day to show hourly data for~~
