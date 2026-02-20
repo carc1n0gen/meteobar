@@ -1,3 +1,18 @@
+# Meteobar
+
+CLI tool for generating weather data for waybar using [open-meteo API](https://open-meteo.com/). Heavily inspired by [wttrbar](https://github.com/bjesus/wttrbar).
+
+**Indicator**
+
+<img width="98" height="44" alt="image" src="https://github.com/user-attachments/assets/81c2ea8d-0b57-4566-b093-17e96d2d297a" />
+
+<br />
+<br />
+
+**Tooltip**
+
+<img width="300" alt="Screenshot_20260220_071630" src="https://github.com/user-attachments/assets/f4d8d5c7-8aac-443c-8b7d-e6309705a20c" />
+
 ## Installation
 
 ### From Source
