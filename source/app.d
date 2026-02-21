@@ -2,7 +2,6 @@ module meteobar;
 
 import std.stdio;
 import std.string;
-import std.variant;
 import std.datetime;
 import std.conv : to;
 import std.format : format;
@@ -15,23 +14,23 @@ import core.stdc.locale : setlocale, LC_TIME;
 
 import cli : parseArgs;
 import utils : parseDateTime, formatDateTime;
-import openmeteo : weatherApi, deMatrixData, getWeatherCodeInfo, OpenMeteoResponseException, OpenMeteoConnectionException;
+import openmeteo : ParamValue, weatherApi, deMatrixData, getWeatherCodeInfo, OpenMeteoResponseException, OpenMeteoConnectionException;
 
 
 int main(string[] args)
 {
 	setlocale(LC_TIME, ""); // Use system locale for date formatting
 	auto options = parseArgs(args);
-	Variant[string] params = [
-		"latitude":         Variant(options.latitude),
-		"longitude":        Variant(options.longitude),
-		"daily":            Variant(options.daily),
-		"hourly":           Variant(options.hourly),
-		"current":          Variant(options.current),
-		"temperature_unit": Variant(options.temperatureUnit),
-		"wind_speed_unit":  Variant(options.windSpeedUnit),
-		"forecast_days":    Variant(3),
-		"timezone":         Variant("auto")
+	ParamValue[string] params = [
+		"latitude":         ParamValue(options.latitude),
+		"longitude":        ParamValue(options.longitude),
+		"daily":            ParamValue(options.daily),
+		"hourly":           ParamValue(options.hourly),
+		"current":          ParamValue(options.current),
+		"temperature_unit": ParamValue(options.temperatureUnit),
+		"wind_speed_unit":  ParamValue(options.windSpeedUnit),
+		"forecast_days":    ParamValue("3"),
+		"timezone":         ParamValue("auto")
 	];
 
 	writeln(`{"text":"⏳","tooltip":"Loading...","class":"loading"}`);

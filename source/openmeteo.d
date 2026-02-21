@@ -2,9 +2,9 @@ module openmeteo;
 
 import std.conv;
 import std.stdio;
-import std.variant;
-import std.array : join;
+import std.array : join, appender;
 import std.datetime : dur;
+import std.sumtype : SumType, match;
 import std.algorithm.searching : canFind;
 import std.json : JSONValue, parseJSON, JSONException;
 
@@ -13,8 +13,14 @@ import curl = std.net.curl;
 import core.thread : Thread;
 
 
-private immutable string[] PARAM_ARRAY_KEYS = ["daily", "hourly", "current"];
+/**
+ * Represents a param for the open-meteo API, which can either be a string or array of strings.
+ */
+alias ParamValue = SumType!(string, string[]);
 
+/**
+ * The keys in the open-meteo response that have a matrix-like structure where there are multiple parallel arrays.
+ */
 private immutable string[] MATRIX_ARRAY_KEYS = ["daily", "hourly"];
 
 /**
@@ -105,30 +111,26 @@ WeatherCodeInfo getWeatherCodeInfo(int code)
  * Makes a GET request to the specified open-meteo API URL with the given parameters and returns the parsed response as a `JSONValue`.
  * Params:
  *   url: (`string`) The base URL of the open-meteo API endpoint.
- *   parameters: (`Variant[string]`) An associative array of query parameters to include in the API request. The values can be either strings or arrays of strings.
+ *   parameters: (`ParamValue[string]`) An associative array of query parameters to include in the API request. The values can be either strings or arrays of strings.
  * Returns:
  *   A `JSONValue` containing the parsed response from the open-meteo API.
  * Throws:
  *   `OpenMeteoResponseException` if the API response cannot be parsed as valid JSON.
  *   `OpenMeteoConnectionException` if the API request fails after multiple attempts. The function will retry the request up to 20 times with a backoff strategy before throwing this exception.
  */
-JSONValue weatherApi(string url, Variant[string] parameters)
+JSONValue weatherApi(string url, ParamValue[string] parameters)
 {
-    string paramString = "";
+    auto paramString = appender!string();
     foreach (kv; parameters.byKeyValue)
     {
-        paramString ~= kv.key ~ "=";
+        paramString.put(kv.key ~ "=");
 
-        if (canFind(PARAM_ARRAY_KEYS, kv.key))
-        {
-            paramString ~= kv.value.get!(string[]).join(",");
-        }
-        else
-        {
-            paramString ~= kv.value.to!string;
-        }
+        paramString.put(kv.value.match!(
+            (string s) => s,
+            (string[] arr) => arr.join(",")
+        ));
 
-        paramString ~= "&";
+        paramString.put("&");
     }
 
     int attempts = 0;
@@ -137,7 +139,7 @@ JSONValue weatherApi(string url, Variant[string] parameters)
     {
         try
         {
-            string response = cast(string)curl.get(url ~ "?" ~ paramString);
+            string response = cast(string)curl.get(url ~ "?" ~ paramString.data);
             return parseJSON(response);
         }
         catch (JSONException jsonEx)
