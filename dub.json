@@ -9,6 +9,7 @@
 	"targetPath": "bin",
 	"dependencies": {
 	},
+	"dflags-ldc": ["-link-defaultlib-shared=false"],
 	"buildTypes": {
 		"debug": {
 			"buildOptions": ["debugMode", "debugInfo"]
