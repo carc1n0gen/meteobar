@@ -12,6 +12,7 @@ import curl = std.net.curl;
 
 import core.thread : Thread;
 
+import utils : apiBackoffRetry;
 
 /**
  * Represents a param for the open-meteo API, which can either be a string or array of strings.
@@ -22,28 +23,6 @@ alias ParamValue = SumType!(string, string[]);
  * The keys in the open-meteo response that have a matrix-like structure where there are multiple parallel arrays.
  */
 private immutable string[] MATRIX_ARRAY_KEYS = ["daily", "hourly"];
-
-/**
- * Exception thrown when the open-meteo API returns an invalid response that cannot be parsed as JSON.
- */
-class OpenMeteoResponseException : Exception
-{
-    this(string message)
-    {
-        super(message);
-    }
-}
-
-/**
- * Exception thrown when the weatherApi function fails to connect to the open-meteo API after multiple attempts.
- */
-class OpenMeteoConnectionException : Exception
-{
-    this(string message)
-    {
-        super(message);
-    }
-}
 
 /**
  * Represents weather description and icon for a given weather code.
@@ -58,34 +37,34 @@ struct WeatherCodeInfo
  * An associative array mapping weather codes to their corresponding descriptions and icons.
  */
 private immutable WeatherCodeInfo[int] WEATHER_CODE_INFO = [
-     0: WeatherCodeInfo("Clear sky",                     "☀️"),
-     1: WeatherCodeInfo("Mainly clear",                  "🌤️"),
-     2: WeatherCodeInfo("Partly cloudy",                 "⛅"),
-     3: WeatherCodeInfo("Overcast",                      "☁️"),
-    45: WeatherCodeInfo("Fog",                           "🌫️"),
-    48: WeatherCodeInfo("Depositing Rime Fog",           "🌫️"),
-    51: WeatherCodeInfo("Light drizzle",                 "🌦️"),
-    53: WeatherCodeInfo("Moderate drizzle",              "🌦️"),
-    55: WeatherCodeInfo("Dense drizzle",                 "🌦️"),
-    56: WeatherCodeInfo("Light freezing drizzle",        "🌧️"),
-    57: WeatherCodeInfo("Dense freezing drizzle",        "🌧️"),
-    61: WeatherCodeInfo("Light rain",                    "🌦️"),
-    63: WeatherCodeInfo("Moderate rain",                 "🌧️"),
-    65: WeatherCodeInfo("Heavy rain",                    "🌧️"),
-    66: WeatherCodeInfo("Light freezing rain",           "🌧️"),
-    67: WeatherCodeInfo("Heavy freezing rain",           "🌧️"),
-    71: WeatherCodeInfo("Slight snow fall",              "🌨️"),
-    73: WeatherCodeInfo("Moderate snow fall",            "🌨️"),
-    75: WeatherCodeInfo("Heavy snow fall",               "❄️"),
-    77: WeatherCodeInfo("Snow grains",                   "🌨️"),
-    80: WeatherCodeInfo("Slight rain showers",           "🌦️"),
-    81: WeatherCodeInfo("Moderate rain showers",         "🌧️"),
-    82: WeatherCodeInfo("Violent rain showers",          "⛈️"),
-    85: WeatherCodeInfo("Slight snow showers",           "🌨️"),
-    86: WeatherCodeInfo("Heavy snow showers",            "❄️"),
-    95: WeatherCodeInfo("Thunderstorm",                  "⛈️"),
-    96: WeatherCodeInfo("Thunderstorm with slight hail", "⛈️"),
-    99: WeatherCodeInfo("Thunderstorm with heavy hail",  "⛈️")
+    0: WeatherCodeInfo("Clear sky", ""),
+    1: WeatherCodeInfo("Mainly clear", ""),
+    2: WeatherCodeInfo("Partly cloudy", ""),
+    3: WeatherCodeInfo("Overcast", ""),
+    45: WeatherCodeInfo("Fog", ""),
+    48: WeatherCodeInfo("Depositing Rime Fog", ""),
+    51: WeatherCodeInfo("Light drizzle", ""),
+    53: WeatherCodeInfo("Moderate drizzle", ""),
+    55: WeatherCodeInfo("Dense drizzle", ""),
+    56: WeatherCodeInfo("Light freezing drizzle", ""),
+    57: WeatherCodeInfo("Dense freezing drizzle", ""),
+    61: WeatherCodeInfo("Light rain", ""),
+    63: WeatherCodeInfo("Moderate rain", ""),
+    65: WeatherCodeInfo("Heavy rain", ""),
+    66: WeatherCodeInfo("Light freezing rain", ""),
+    67: WeatherCodeInfo("Heavy freezing rain", ""),
+    71: WeatherCodeInfo("Slight snow fall", ""),
+    73: WeatherCodeInfo("Moderate snow fall", ""),
+    75: WeatherCodeInfo("Heavy snow fall", ""),
+    77: WeatherCodeInfo("Snow grains", ""),
+    80: WeatherCodeInfo("Slight rain showers", ""),
+    81: WeatherCodeInfo("Moderate rain showers", ""),
+    82: WeatherCodeInfo("Violent rain showers", ""),
+    85: WeatherCodeInfo("Slight snow showers", ""),
+    86: WeatherCodeInfo("Heavy snow showers", ""),
+    95: WeatherCodeInfo("Thunderstorm", ""),
+    96: WeatherCodeInfo("Thunderstorm with slight hail", ""),
+    99: WeatherCodeInfo("Thunderstorm with heavy hail", "")
 ];
 
 /**
@@ -126,37 +105,21 @@ JSONValue weatherApi(string url, ParamValue[string] parameters)
         paramString.put(kv.key ~ "=");
 
         paramString.put(kv.value.match!(
-            (string s) => s,
-            (string[] arr) => arr.join(",")
+                (string s) => s,
+                (string[] arr) => arr.join(",")
         ));
 
         paramString.put("&");
     }
 
-    int attempts = 0;
-    int maxAttempts = 20;
-    while (true)
-    {
-        try
-        {
-            string response = cast(string)curl.get(url ~ "?" ~ paramString.data);
-            return parseJSON(response);
-        }
-        catch (JSONException jsonEx)
-        {
-            throw new OpenMeteoResponseException("Invalid open-meteo response: " ~ jsonEx.msg);
-        }
-        catch (curl.CurlException curlEx)
-        {
-            attempts++;
-            if (attempts >= maxAttempts)
-            {
-                throw new OpenMeteoConnectionException("Failed to reach to open-meteo API after " ~ attempts.to!string ~ " attempts: " ~ curlEx.msg);
-            }
+    string response;
+    JSONValue parsedResponse;
+    apiBackoffRetry(() {
+        response = cast(string) curl.get(url ~ "?" ~ paramString.data);
+        parsedResponse = parseJSON(response);
+    });
 
-            Thread.sleep(dur!("msecs")(500 * attempts));
-        }
-    }
+    return parsedResponse;
 }
 
 private JSONValue[] recordsFromMatrix(JSONValue matrix)

@@ -23,12 +23,15 @@ Install `ldc` (or `dmd` if you prefer) and `dub` on your distro of choice then c
 
 Head over to [releases](https://github.com/carc1n0gen/meteobar/releases), download the latest version, extract the .tar.gz, and put the resulting `meteobar` binary somewhere in your path.
 
+## Requirements
+
+Really the only thing you need on your system is a [nerd patched font](https://www.nerdfonts.com/).
+
 ## Usage
 
 ```
 Usage: meteobar [options]
-           --lat Latitude of the location
-          --long Longitude of the location
+      --location Location in form of 'lat,long', 'CITY NAME', or 'auto' for auto-detection (default: auto)
          --daily Daily variables (comma-separated) (optional)
         --hourly Hourly variables (comma-separated) (optional)
        --current Current variables (comma-separated) (optional)
@@ -50,25 +53,30 @@ The `--daily`, `--hourly`, and `--current` have default values if not provided:
 
 ## Waybar Config
 
-(example location set to Toronto)
-
-```
+```json
+// config.jsonc
 "custom/meteobar": {
     "format": "{}",
     "tooltip": true,
     "restart-interval": 3600,
-    "exec": "meteobar --lat=43.71 --long=-79.54",
+    "exec": "meteobar", // With no args passed, location is determined by ip geolocation
     "return-type": "json"
 }
 ```
 
-You can get your latitude/longitude pretty easily with `curl ipinfo.io`, or even better if you have `jq` installed you can run `curl -s ipinfo.io | jq -r '.loc'`
+```css
+/* style.css */
+* {
+    font-family: "Noto Sans Mono", "NotoSans Nerd Font";
+    font-size: 16px;
+}
+```
 
-For the data in the tooltip to align correctly, it is best to use a monospace font for waybar, or at least the tooltips.
+For the best experience I recommend using a monospace font for at least the tooltips if not the whole waybar. Also set a second font that's been patched with nerd fonts in order for weather icons to render correctly. If you find that the weather icons look really small or squished, try a non-monospace nerd patched font as the second font in your font stack.
 
 ## TODO
 
 - translations support
 - ~~custom date formats~~
-- location auto-detection
+- ~~location auto-detection~~
 - ~~param to defined how many hours per day to show hourly data for~~
