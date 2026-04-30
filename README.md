@@ -4,14 +4,14 @@ CLI tool for generating weather data for waybar using [open-meteo API](https://o
 
 **Indicator**
 
-<img width="98" height="44" alt="image" src="https://github.com/user-attachments/assets/81c2ea8d-0b57-4566-b093-17e96d2d297a" />
+<img width="93" height="57" alt="image" src="https://github.com/user-attachments/assets/8914f3ef-a638-4ce9-947f-2651287ce688" />
 
 <br />
 <br />
 
 **Tooltip**
 
-<img width="300" alt="Screenshot_20260220_071630" src="https://github.com/user-attachments/assets/f4d8d5c7-8aac-443c-8b7d-e6309705a20c" />
+<img width="397" height="912" alt="image" src="https://github.com/user-attachments/assets/6b9e5414-2745-4c91-a302-91ef030a5780" />
 
 ## Installation
 
